@@ -1,0 +1,77 @@
+#+TITLE: Sentinel Redis like a bo$$
+#+DATE: Wednesday, Jan 04 2017
+#+DESCRIPTION: redis ha setup experiments
+
+* Playing with sentinel
+  :PROPERTIES:
+  :var: cluster_master="redis-cluster"
+  :END:
+** Check the heatbeat
+
+  - [X] check if sentinels is alive  
+   #+NAME: sentinels
+   | sentinel1 | 16380 |
+   | sentinel2 | 16381 |
+   | sentinel3 | 16382 |
+   #+BEGIN_SRC bash :var redis=sentinels[,-1] :results drawer
+cmd=ping
+ports=$( echo $redis )
+for port in ${ports[@]}; do
+    echo -n "knocking $port... "
+    redis-cli -p $port $cmd || echo "can't knock $port";
+done
+    #+END_SRC
+   #+RESULTS:
+   :RESULTS:
+   knocking 16380... PONG
+   knocking 16381... PONG
+   knocking 16382... PONG
+   :END:
+
+  - [X] check if redis is alive
+   #+NAME: redisz
+   | redis1 | 6380 |
+   | redis2 | 6381 |
+   | redis3 | 6382 |
+   #+BEGIN_SRC bash :var redis=redisz[,-1] :results drawer
+cmd=ping
+ports=$( echo $redis )
+for port in ${ports[@]}; do
+    echo -n "knocking $port... "
+    redis-cli -p $port $cmd || echo "can't knock $port";
+done
+   #+END_SRC
+   #+RESULTS:
+   :RESULTS:
+   knocking 6380... can't knock 6380
+   knocking 6381... PONG
+   knocking 6382... PONG
+   :END:
+** find the master
+   :PROPERTIES:
+   :var+: command_to_execute="SENTINEL get-master-addr-by-name"
+   :END:
+   #+NAME: sentinels
+   | sentinel1 | 16380 |
+   | sentinel2 | 16381 |
+   | sentinel3 | 16382 |
+   #+BEGIN_SRC bash :var redis=sentinels[,-1] :results drawer
+cmd="$command_to_execute $cluster_master"
+ports=$( echo $redis )
+for port in ${ports[@]}; do
+    master=$(redis-cli -p $port $cmd)
+    [ $? -ne 0 ] && echo -n "🙊 $port : $cmd";
+    echo 🏁 $port : $master
+
+done
+    #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   🏁 16380 : 127.0.0.1 6381
+   🏁 16381 : 127.0.0.1 6381
+   🏁 16382 : 127.0.0.1 6381
+   :END:
+
+
+   
