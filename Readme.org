@@ -1,0 +1,31 @@
+#+TITLE: lets simplify the learning 
+#+DATE: Wednesday, Jan 04 2017
+#+DESCRIPTION: playing with newstuffs, the orgmode way
+
+* coverage
+
+  | topic | details                   | date                           |
+  |-------+---------------------------+--------------------------------|
+  | redis | tinkering sentinel basics | #+DATE: Wednesday, Jan 04 2017 |
+  |       |                           |                                |
+
+
+*** Assumptions
+
+    i love to split my terminal and jump around org files, so do you.
+    my tool chain comprise of  [[https://tmux.github.io/][tmux]], [[https://xkcd.com/378/][emacs]], [[http://orgmode.org/][org-mode]] & X where,
+    /X=guinea pigs of different taste/ {dbs(redis,mongo,pg),
+    langs(ruby,sh,go), confs(*rc, emacs*), random(logs,jsons,list,resume,org,lisp), swag(revealjs,blog)...}
+
+
+*** Motivation
+    
+    i was wondering what if, our works be done/logged in some reproducible
+    way. So far journey have been to consume more and produce less.
+    Consumption is so random, and kindof hardocoded to brain as some
+    sumof(context, env vars, github/gist urls, stackoverflow tricks,
+    blogs). Bad thing 😟, they disappear with time. So trying this weird
+    way of trailing the workflow/learning in plain simple text.
+
+    
+
