@@ -43,10 +43,11 @@ done
    #+END_SRC
    #+RESULTS:
    :RESULTS:
-   knocking 6380... can't knock 6380
+   knocking 6380... PONG
    knocking 6381... PONG
    knocking 6382... PONG
    :END:
+
 ** find the master
    :PROPERTIES:
    :var+: command_to_execute="SENTINEL get-master-addr-by-name"
@@ -57,7 +58,7 @@ done
    | sentinel3 | 16382 |
    #+BEGIN_SRC bash :var redis=sentinels[,-1] :results drawer
 cmd="$command_to_execute $cluster_master"
-ports=$( echo $redis )
+ports=( $redis )
 for port in ${ports[@]}; do
     master=$(redis-cli -p $port $cmd)
     [ $? -ne 0 ] && echo -n "🙊 $port : $cmd";
@@ -68,10 +69,38 @@ done
 
    #+RESULTS:
    :RESULTS:
-   🏁 16380 : 127.0.0.1 6381
-   🏁 16381 : 127.0.0.1 6381
-   🏁 16382 : 127.0.0.1 6381
+   🏁 16380 : 127.0.0.1 6382
+   🏁 16381 : 127.0.0.1 6382
+   🏁 16382 : 127.0.0.1 6382
+   :END:
+** sleep the master
+   :PROPERTIES:
+   :var+: command_to_execute="SENTINEL get-master-addr-by-name"
+   :END:
+   #+NAME: sentinels
+   | sentinel1 | 16380 |
+   | sentinel2 | 16381 |
+   | sentinel3 | 16382 |
+   #+BEGIN_SRC bash :var sentinel=sentinels[,-1] :results drawer
+cmd="$command_to_execute $cluster_master"
+ports=( $sentinel )
+port="${ports[$RANDOM%${#ports[@]}]}"
+master=$(redis-cli -p $port $cmd)
+redis_config=( $master )
+echo "let ask the master: ${redis_config[@]} to sleep for 30s"
+echo "executing: redis-cli -p ${redis_config[1]} DEBUG SLEEP 10"
+redis-cli -p ${redis_config[1]} DEBUG SLEEP 30&
+    #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   let ask the master: 127.0.0.1 6381 to sleep for 30s
+   executing: redis-cli -p 6381 DEBUG SLEEP 10
+   OK
    :END:
 
+ 
+  
+* 
 
    
