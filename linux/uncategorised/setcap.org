@@ -1,0 +1,111 @@
+#+TITLE: Playing with ports less than 1024
+#+DATE: Sunday, Jan 08 2017
+#+DESCRIPTION: do i need to be sudo to use port less than 1024, fuckno🙊
+
+* What I wanted
+  I wanted start my servers in the port i wanted, I don't care if its
+  below 1024 or higher. I just want it, and I want it bad 😠
+
+  Solution
+  #+BEGIN_SRC bash
+sudo setcap cap_net_bind_service=+ep `which node`
+  #+END_SRC
+
+* What I learned
+
+- there is thing called capability (the quality of being capable --
+  physically or intellectually or legally) in Linux. i just stumbled
+  upon a useful one 😈
+#+BEGIN_SRC bash :results drawer :exports both
+man capabilities | head -n 20
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+CAPABILITIES(7)            Linux Programmer's Manual           CAPABILITIES(7)
+
+NAME
+       capabilities - overview of Linux capabilities
+
+DESCRIPTION
+       For  the  purpose  of  performing  permission  checks, traditional UNIX
+       implementations distinguish two  categories  of  processes:  privileged
+       processes  (whose  effective  user ID is 0, referred to as superuser or
+       root), and unprivileged processes (whose  effective  UID  is  nonzero).
+       Privileged processes bypass all kernel permission checks, while unpriv‐
+       ileged processes are subject to full permission checking based  on  the
+       process's  credentials (usually: effective UID, effective GID, and sup‐
+       plementary group list).
+
+       Starting with kernel 2.2, Linux divides  the  privileges  traditionally
+       associated  with  superuser into distinct units, known as capabilities,
+       which can be independently enabled and disabled.   Capabilities  are  a
+       per-thread attribute.
+
+:END:
+
+** and we have helper function, yes like always 😀
+#+BEGIN_SRC bash :results drawer :exports both
+man setcap |head -n8
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+SETCAP(8)                   System Manager's Manual                  SETCAP(8)
+
+NAME
+       setcap - set file capabilities
+
+SYNOPSIS
+       setcap [-q] [-v] (capabilities|-|-r) filename [ ... capabilitiesN fileN
+       ]
+:END:
+
+* What anybody can learn 
+
+With my current knowledge I think, playing with *capabilities* is more
+beneficient in multiple dimensions. 
+
+Eg: lets get the capabilities that a *ping* binary can do.
+
+#+BEGIN_SRC bash :exports both
+getcap `which ping`
+#+END_SRC
+
+#+RESULTS:
+: /usr/bin/ping = cap_net_raw+ep
+
+which by *man capabilities* says:
+#+BEGIN_QUOTE
+     CAP_NET_RAW
+          * use RAW and PACKET sockets;
+          * bind to any address for transparent proxying.
+#+END_QUOTE
+
+** With my clear as mud knowledge about capabilites:
+   If there is a desire to use or [[https://twitter.com/thapakazi_/status/818074314679418880][:trollface:]]  there are possibilities
+   to more useful use-cases like i used earlier.
+   #+BEGIN_SRC bash :exports both :results drawer
+   sudo setcap cap_net_bind_service=+ep `which node`
+   getcap `which node`
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+   /usr/bin/node = cap_net_bind_service+ep
+   :END:
+
+   where, 
+   #+BEGIN_SRC bash :exports both :results drawer
+man capabilities | grep -A3 -i 'cap_net_bind_service'
+   #+END_SRC
+
+   #+RESULTS:
+   :RESULTS:
+          CAP_NET_BIND_SERVICE
+                 Bind  a socket to Internet domain privileged ports (port numbers
+                 less than 1024).
+
+   :END:
+
+
